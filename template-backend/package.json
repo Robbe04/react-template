@@ -1,0 +1,31 @@
+{
+  "name": "template-backend",
+  "packageManager": "yarn@4.3.1",
+  "private": true,
+  "devDependencies": {
+    "@types/koa": "^2",
+    "@types/koa-bodyparser": "^4.3.12",
+    "@types/koa__router": "^12.0.4",
+    "@types/node": "^22.12.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start:dev": "tsx watch src/index.ts"
+  },
+  "prisma": {
+    "schema": "src/data/schema.prisma",
+    "seed": "tsx ./src/data/seed.ts"
+  },
+  "dependencies": {
+    "@koa/router": "^13.1.0",
+    "@prisma/client": "^6.3.0",
+    "@types/config": "^3.3.5",
+    "config": "^3.3.12",
+    "koa": "^2.15.3",
+    "koa-bodyparser": "^4.4.1",
+    "prisma": "^6.3.0",
+    "winston": "^3.17.0"
+  }
+}
