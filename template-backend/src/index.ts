@@ -1,26 +1,21 @@
-import { getLogger } from "../core/logging";
-import bodyParser from 'koa-bodyparser'; 
-import Router from '@koa/router'; 
-import { initializeData } from './data';
+import createServer from './createServer';
 
-const Koa = require('koa'); 
-const app = new Koa(); 
+async function main() {
+  try {
+    const server = await createServer();
+    await server.start();
 
-async function main() : Promise<void> {
-  app.use(bodyParser());
+    async function onClose() {
+      await server.stop(); 
+      process.exit(0); 
+    }
 
-const router = new Router();
-
-app
-  .use(router.routes())
-  .use(router.allowedMethods());
-
-app.listen(9000, () => {
-  getLogger().info('🚀 Server listening on http://127.0.0.1:9000');
-});
-
-await initializeData();
+    process.on('SIGTERM', onClose);
+    process.on('SIGQUIT', onClose); 
+  } catch (error) {
+    console.log('\n', error); 
+    process.exit(-1); 
+  }
 }
 
-main();
-
+main(); 

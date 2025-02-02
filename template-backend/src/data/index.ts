@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { getLogger } from '../../core/logging';
+import { getLogger } from '../core/logging';
 
 export const prisma = new PrismaClient(); 
 
