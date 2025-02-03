@@ -1,15 +1,29 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import Home from './components/Home.jsx';
+import Home from './components/home/Home.jsx';
 import NotFound from './pages/NotFound.jsx';
 import Layout from './components/Layout.jsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import UserList from './pages/user/UserList.jsx';
+import ProductsList from "./pages/products/ProductsList.jsx";
+import ProductDetail from "./pages/products/ProductDetail.jsx"
 
 const router = createBrowserRouter([
   {
     element: <Layout />, children: [
       {path: '/', element: <Home />},
       {path: '*', element: <NotFound />},
+      {path: '/users', element : <UserList/>},
+      {path: '/products', children : [
+        {
+          index : true,
+          element : <ProductsList />
+        },
+        {
+          path: ':id',
+          element : <ProductDetail/>
+        }
+      ]} 
     ]
   }
 ]);

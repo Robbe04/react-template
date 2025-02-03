@@ -2,19 +2,19 @@ import type { ListResponse } from './common';
 
 export interface Product {
   productId : number
-  productName : String
+  productName : string
   unitPrice : number
   categoryId : number
   supplierId : number
-  image : String
+  image : string
 }
 
 export interface ProductCreateInput {
-  productName : String
+  productName : string
   unitPrice : number
   categoryId : number
   supplierId : number
-  image : String
+  image : string
 }
 
 export interface ProductUpdateInput extends ProductCreateInput {}

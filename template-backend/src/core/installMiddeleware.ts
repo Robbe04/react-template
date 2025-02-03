@@ -3,9 +3,13 @@ import bodyParser from 'koa-bodyparser';
 import koaCors from '@koa/cors';
 import type { KoaApplication } from '../types/koa';
 import { getLogger } from './logging';
+import ServiceError from './serviceError';
+import serve from 'koa-static';
+
 
 const CORS_ORIGINS = config.get<string[]>('cors.origins');
 const CORS_MAX_AGE = config.get<number>('cors.maxAge');
+const NODE_ENV = config.get<string>('env');
 
 export default function installMiddlewares(app: KoaApplication) {
   app.use(
@@ -22,6 +26,9 @@ export default function installMiddlewares(app: KoaApplication) {
     }),
   );
 
+  // Ophalen fotos uit de public map
+  app.use(serve('public'));
+  
   app.use(async (ctx, next) => {
       getLogger().info(`⏩ ${ctx.method} ${ctx.url}`);
     
@@ -38,6 +45,63 @@ export default function installMiddlewares(app: KoaApplication) {
       getLogger().info(
         `${getStatusEmoji()} ${ctx.method} ${ctx.status} ${ctx.url}`,
       );
+    });
+
+    app.use(async (ctx, next) => {
+      try {
+        await next(); 
+      } catch (error: any) {
+        getLogger().error('Error occured while handling a request', { error });
+    
+        let statusCode = error.status || 500;
+        const errorBody = {
+          code: error.code || 'INTERNAL_SERVER_ERROR',
+          // Do not expose the error message in production
+          message:
+            error.message || 'Unexpected error occurred. Please try again later.',
+          details: error.details,
+          stack: NODE_ENV !== 'production' ? error.stack : undefined,
+        };
+    
+        if (error instanceof ServiceError) {
+          errorBody.message = error.message;
+    
+          if (error.isNotFound) {
+            statusCode = 404;
+          }
+    
+          if (error.isValidationFailed) {
+            statusCode = 400;
+          }
+    
+          if (error.isUnauthorized) {
+            statusCode = 401;
+          }
+    
+          if (error.isForbidden) {
+            statusCode = 403;
+          }
+    
+          if (error.isConflict) {
+            statusCode = 409;
+          }
+        }
+    
+        ctx.status = statusCode;
+        ctx.body = errorBody;
+      }
+    });
+    
+    app.use(async (ctx, next) => {
+      await next();
+    
+      if (ctx.status === 404) {
+        ctx.status = 404;
+        ctx.body = {
+          code: 'NOT_FOUND',
+          message: `Unknown resource: ${ctx.url}`,
+        };
+      }
     });
 
   app.use(bodyParser());

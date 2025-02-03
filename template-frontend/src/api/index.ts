@@ -1,16 +1,16 @@
 import axios from 'axios';
 
-const baseURL = "http://localhost:9000";
+const baseURL = "http://localhost:9000/api";
 
 /**
  * Haal alle items op van een bepaald endpoint.
  * @param {string} url - Het endpoint van de API dat je wil oproepen.
  * @returns {Promise<Array>} - Een array met alle opgehaalde items.
  */
-export const getAll = async (url) => {
-   const { data } = await axios.get(url);
+export const getAll = async (url : string) => {
+   const { data } = await axios.get(`${baseURL}/${url}`);
    return data.items;
- };
+};
 
  /**
  * Haal gegevens op van een specifiek endpoint via zijn ID.
@@ -19,7 +19,7 @@ export const getAll = async (url) => {
  * @returns {Promise<Object>} - De gegevens van het opgehaalde item.
  */
 export const getById = async (url, {arg : id}) => {
-   const { data } = await axios.get(`${url}/${id}`);
+   const { data } = await axios.get(`${baseURL}/${url}/${id}`);
    return data;
  };
  
@@ -30,7 +30,7 @@ export const getById = async (url, {arg : id}) => {
   * @param {number|string} param.arg - De ID van het item.
   */
  export const deleteById = async (url, { arg: id }) => {
-   await axios.delete(`${url}/${id}`);
+   await axios.delete(`${baseURL}/${url}/${id}`);
  };
  
  /**
@@ -41,7 +41,7 @@ export const getById = async (url, {arg : id}) => {
   * @returns {Promise<Object>} - De bijgewerkte gegevens.
   */
  export const updateById = async (url, { arg: id, body }) => {
-   const { data } = await axios.put(`${url}/${id}`, body);
+   const { data } = await axios.put(`${baseURL}/${url}/${id}`, body);
    return data;
  };
  
@@ -54,7 +54,7 @@ export const getById = async (url, {arg : id}) => {
  export const save = async (url, { arg: { id, ...data } }) => {
    await axios({
      method: id ? 'PUT' : 'POST',
-     url: `${url}/${id ?? ''}`,
+     url: `${baseURL}/${url}/${id ?? ''}`,
      data,
    });
  };
