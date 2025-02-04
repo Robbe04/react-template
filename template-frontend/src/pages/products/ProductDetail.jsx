@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import * as api from "../../api/index";
 import AsyncData from '../../components/AsyncData';
 import * as helpers from "../../../helpers/helpers";
-
+import { Link } from 'react-router-dom';
 const baseApiUrl = helpers.VITE_API_URL;
 
 export default function ProductDetail() {
@@ -19,24 +19,28 @@ export default function ProductDetail() {
   }
 
   return (
-    <AsyncData error={error} loading={isLoading}>
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
-        <div className="card" style={{ width: '18rem' }}>
+<AsyncData error={error} loading={isLoading}>
+  <div className="d-flex align-items-center justify-content-center min-vh-100">
+    <div className="border border-light p-4" style={{ maxWidth: '600px', width: '100%' }}>
+      <div className="d-flex align-items-start">
+        <div className="product-image me-3">
           <img 
-            src={product.image ? `${baseApiUrl}/img/${product.image}` : "/placeholder.jpg"} 
+            src={product.image ? `${baseApiUrl}/img/${product.image}` : '/placeholder.jpg'} 
             alt={`Picture of product: ${product.productName}`} 
-            onError={(e) => e.target.src = "/placeholder.jpg"} // Fallback bij error
+            className="img-fluid"
           />
-          <div className="card-body text-center">
-            <h5 className="card-title">{product.productName}</h5>
-            <p className="card-text">{product.description || 'No description available'}</p>
-            <p className="card-text">
-              Delivered by: {product.supplier.firstName} {product.supplier.lastName}
-            </p>
-            <button className="btn btn-primary">More Info</button>
+        </div>
+        <div className="product-details flex-grow-1 d-flex flex-column">
+          <h3 className="border-bottom pb-2 mb-3">{product.productName}</h3>
+          <div className="mt-auto">
+            <h5>Delivered by: <Link to={`/products/suppliers/${product.supplier.supplierId}`}>{product.supplier.firstName} {product.supplier.lastName}</Link></h5>
+            <p>{product.description || 'No description available'}</p>
+            <p>Price: ${product.unitPrice}</p>
           </div>
         </div>
       </div>
-    </AsyncData>
+    </div>
+  </div>
+</AsyncData>
   );
 }

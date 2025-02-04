@@ -1,13 +1,13 @@
 import axios from 'axios';
 
-const baseURL = "http://localhost:9000/api";
+const baseURL = import.meta.env.VITE_API_URL + "/api";
 
 /**
  * Haal alle items op van een bepaald endpoint.
  * @param {string} url - Het endpoint van de API dat je wil oproepen.
  * @returns {Promise<Array>} - Een array met alle opgehaalde items.
  */
-export const getAll = async (url : string) => {
+export const getAll = async (url) => {
    const { data } = await axios.get(`${baseURL}/${url}`);
    return data.items;
 };
@@ -44,6 +44,17 @@ export const getById = async (url, {arg : id}) => {
    const { data } = await axios.put(`${baseURL}/${url}/${id}`, body);
    return data;
  };
+
+ /**
+  * Voegt iets toe aan de REST-api
+  * @param url - Het endpoint van de API dat je wil oproepen.
+  * @param param1 - Object met de bij te werken gegevens.
+  * @returns {Promise<Object>} - Het nieuw aangemaakte item
+  */
+ export const post = async(url, {arg}) => {
+  const {data} = await axios.post(`${baseURL}/${url}`, arg)
+  return data
+ }
  
  /**
   * Sla een nieuw item op of werk een bestaand item bij.

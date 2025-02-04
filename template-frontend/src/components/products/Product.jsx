@@ -23,6 +23,9 @@ export default function Product({ product }) {
             {product.supplier.firstName} {product.supplier.lastName}
           </Link>
         </p>
+        <p className="card-text">
+          Price: ${product.unitPrice}
+        </p>
         <div className="text-center">
           <Link to={`/products/${product.productId}`} className="btn btn-primary">
             View Product
