@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+import { useAuthentication } from "../contexts/authentication";
 
 export default function Navbar() {
+  const { isAuthed } = useAuthentication();
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-black shadow-lg border-bottom border-white">
       <div className="container">
@@ -39,11 +42,21 @@ export default function Navbar() {
               </Link>
             </li>
 
-            <li className="nav-item">
-              <Link className="nav-link text-white px-3 py-2 border border-white rounded ms-2" to="/login">
-                Login
-              </Link>
-            </li>
+
+            {isAuthed ? (
+              <li className="nav-item">
+                <Link className="nav-link text-white px-3 py-2 border border-white rounded ms-2" to="/logout">
+                  Logout
+                </Link>
+              </li>
+            ) : (
+              <li className="nav-item">
+                <Link className="nav-link text-white px-3 py-2 border border-white rounded ms-2" to="/login">
+                  Login
+                </Link>
+              </li>
+            )
+            }
             
           </ul>
         </div>

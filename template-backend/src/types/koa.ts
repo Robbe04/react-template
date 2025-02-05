@@ -1,8 +1,11 @@
 import type { ParameterizedContext } from 'koa';
 import type Application from 'koa';
 import type Router from '@koa/router';
+import type { SessionInfo } from './authentication';
 
-export interface TemplateAppState {}
+export interface TemplateAppState {
+  session: SessionInfo;
+}
 
 export interface TemplateAppContext<
   Params = unknown,

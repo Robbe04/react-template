@@ -18,6 +18,9 @@ model User {
   firstName  String  @db.VarChar(100)
   lastName   String  @db.VarChar(100)
   emailadres String  @unique
+  password   String  @db.VarChar(100)
+  image      String  @db.VarChar(100)
+  roles      Json
 
   @@map("users")
 }
@@ -33,21 +36,22 @@ model Supplier {
 }
 
 model Product {
-  productId   Int       @id @default(autoincrement())
-  productName String  @db.VarChar(100)
-  unitPrice   Float  @db.Float()
-  categoryId  Int  @db.Int()
-  supplierId  Int @db.Int()
-  image       String @db.VarChar(100)
-  category    Category  @relation(fields: [categoryId], references: [categoryId])
-  supplier    Supplier  @relation(fields: [supplierId], references: [supplierId])
+  productId    Int       @id @default(autoincrement())
+  productName  String    @db.VarChar(100)
+  unitPrice    Float     @db.Float()
+  categoryId   Int       @db.Int()
+  supplierId   Int       @db.Int()
+  image        String    @db.VarChar(100)
+  unitsInStock Int       @db.Int()
+  category     Category  @relation(fields: [categoryId], references: [categoryId])
+  supplier     Supplier  @relation(fields: [supplierId], references: [supplierId])
 
   @@map("products")
 }
 
 model Category {
   categoryId   Int       @id @default(autoincrement())
-  categoryName String  @db.VarChar(100)
+  categoryName String    @db.VarChar(100)
   products     Product[]
 
   @@map("categorys")

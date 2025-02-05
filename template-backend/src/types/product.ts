@@ -6,7 +6,8 @@ export interface Product {
   unitPrice : number
   categoryId : number
   supplierId : number
-  image : string
+  image : string,
+  unitsInStock : number,
 }
 
 export interface ProductCreateInput {
@@ -14,7 +15,8 @@ export interface ProductCreateInput {
   unitPrice : number
   categoryId : number
   supplierId : number
-  image : string
+  image : string,
+  unitsInStock : number,
 }
 
 export interface ProductUpdateInput extends ProductCreateInput {}

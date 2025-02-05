@@ -4,6 +4,9 @@ CREATE TABLE `users` (
     `firstName` VARCHAR(100) NOT NULL,
     `lastName` VARCHAR(100) NOT NULL,
     `emailadres` VARCHAR(191) NOT NULL,
+    `password` VARCHAR(100) NOT NULL,
+    `image` VARCHAR(100) NOT NULL,
+    `roles` JSON NOT NULL,
 
     UNIQUE INDEX `users_emailadres_key`(`emailadres`),
     PRIMARY KEY (`userId`)
@@ -27,6 +30,7 @@ CREATE TABLE `products` (
     `categoryId` INTEGER NOT NULL,
     `supplierId` INTEGER NOT NULL,
     `image` VARCHAR(100) NOT NULL,
+    `unitsInStock` INTEGER NOT NULL,
 
     PRIMARY KEY (`productId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
