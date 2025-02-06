@@ -9,7 +9,7 @@
 https://github.com/Robbe04/react-template.git
 ```
 
-* In zowel de **Front-end** als de **Back-end** voer je dit uit:
+* In zowel de **Front-end** als de **Back-end** voer je dit uit om alle **dependancies** te installeren::
 ```bash
 yarn install
 ```
