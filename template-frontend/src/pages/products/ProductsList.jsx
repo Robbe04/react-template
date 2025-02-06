@@ -7,7 +7,7 @@ export default function ProductsList() {
   const { data: products = [], isLoading: loading, error } = useSWR("products", api.getAll);
 
   return (
-    <div className="container mt-3">
+    <div className="container mt-4">
     <AsyncData error={error} loading={loading}>
       {Array.isArray(products) && products.length > 0 ? (
         <div style={{ 

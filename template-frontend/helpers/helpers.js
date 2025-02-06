@@ -1,4 +1,11 @@
-export const VITE_API_URL = import.meta.env.VITE_API_URL
+export const VITE_API_URL = import.meta.env.VITE_API_URL;
+export const getDatumVanVandaag = new Date();
+export const getMaandVanVandaag = new Date().getMonth();
+export const getDagVanVandaag = new Date().getDay();
+export const getJaarVanVandaag = new Date().getFullYear();
+export const getUurVanVandaag = new Date().getHours();
+export const getTijdInMiliseconden = new Date().getTime();
+
 
 /**
  * Gaat terug naar de vorige pagina in de gebruiker zijn history
@@ -29,5 +36,4 @@ export const genereerUniekNummerId = () => {
    const timestamp = Date.now(); 
    const randomPart = Math.floor(Math.random() * 1000); 
    return Number(`${timestamp}${randomPart}`); 
- };
- 
+};

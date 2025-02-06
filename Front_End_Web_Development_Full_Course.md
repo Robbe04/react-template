@@ -9,6 +9,41 @@ touch README.md;
 touch .gitignore;
 ```
 
+## README.md
+
+* In de `README.md` beschrijf je hoe je de applicatie start alsook het uitvoeren van testen.
+* Dit is een template van hoe meestal een `README` er zal uitzien:
+# naam_repository
+
+## How to install
+
+### Voorbereiding
+
+* Pull dit project met volgende githublink:
+```git
+https://github.com/Robbe04/naam_repository
+```
+
+* In zowel de **Front-end** als de **Back-end** voer je dit uit om alle **dependancies** te installeren:
+```bash
+yarn install
+```
+
+### Front-end
+
+* Maak een `.env` file in de root van het project:
+```env
+VITE_API_URL='http://localhost:9000'
+```
+
+### Back-end
+
+* Maak een `.env` file in de root van het project:
+```env
+NODE_ENV=development
+DATABASE_URL="mysql://USERNAME:PASSWORD@localhost:3306/NAME_DATABASE"
+```
+
 ## Gitgnore
 ```bash
 # Logs
@@ -171,7 +206,7 @@ yarn add -D typescript @types/react @types/react-dom
       * contexts
       * pages
       * api
-         * index.ts
+         * index.js
 
 ## Initialisatie
 
@@ -273,6 +308,53 @@ export default [
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   </body>
 </html>
+```
+
+## Helpers
+
+* Ik vind het ook belangrijk om een `helpers/helpers.js`-bestand te maken met allerlei functies die je af en toe zult gebruiken
+* Dit bestand komt ook een aantal keer in mijn project dus zorg zeker dat je dit hebt
+* Dit is voorlopig hoe mijn bestand eruit ziet:
+```js
+export const VITE_API_URL = import.meta.env.VITE_API_URL;
+export const getDatumVanVandaag = new Date();
+export const getMaandVanVandaag = new Date().getMonth();
+export const getDagVanVandaag = new Date().getDay();
+export const getJaarVanVandaag = new Date().getFullYear();
+export const getUurVanVandaag = new Date().getHours();
+export const getTijdInMiliseconden = new Date().getTime();
+
+
+/**
+ * Gaat terug naar de vorige pagina in de gebruiker zijn history
+ */
+export const handelTerugNaarVorigePagina = () => {
+   window.history.back()
+}
+
+/**
+ * Kopieert een tekst naar je klembord.
+ * @param {string} text - De tekst die je wilt kopiëren naar het klembord.
+ * @returns {Promise<void>}
+ */
+export const copyToClipboard = async (text) => {
+   try {
+     await navigator.clipboard.writeText(text);
+     alert("Text gekopiëerd naar het klembord")
+   } catch (err) {
+     console.error('Fout bij kopiëren naar klembord: ', err);
+   }
+};
+
+/**
+ * Genereert een unieke numerieke ID op basis van timestamp en een willekeurig getal
+ * @returns {number} - Een uniek numeriek ID
+ */
+export const genereerUniekNummerId = () => {
+   const timestamp = Date.now(); 
+   const randomPart = Math.floor(Math.random() * 1000); 
+   return Number(`${timestamp}${randomPart}`); 
+};
 ```
 
 ## Router
@@ -539,7 +621,7 @@ import * as api from '../../api/index';
 export default function UserList() {
    const { data: users = [], error, isLoading: loading } = useSWR("users", api.getAll);
   return (
-    <>
+    <div className="text-center mt-4">
       <h1>All of this template&apos;s users:</h1>
       <AsyncData error={error} loading={loading}>
         <div
@@ -568,7 +650,7 @@ export default function UserList() {
           )}
         </div>
       </AsyncData>
-    </>
+    </div>
   );
 }
 ```
@@ -600,7 +682,7 @@ export default function ProductsList() {
   const { data: products = [], isLoading: loading, error } = useSWR("products", api.getAll);
 
   return (
-    <div className="container mt-3">
+    <div className="container mt-4">
     <AsyncData error={error} loading={loading}>
       {Array.isArray(products) && products.length > 0 ? (
         <div style={{ 
@@ -662,6 +744,70 @@ export default function Product({ product }) {
         </div>
       </div>
     </div>
+  );
+}
+```
+
+### ProductDetail.jsx
+
+* Nu is het de bedoeling dat als we klikken op een `Product` dat we de details ervan kunnen zien
+* Deze functie gaan we volbrengen via `pages/ProductDetail.jsx`
+```jsx
+import { useParams } from 'react-router-dom';
+import useSWR from 'swr';
+import * as api from "../../api/index";
+import AsyncData from '../../components/AsyncData';
+import * as helpers from "../../../helpers/helpers";
+import { Link } from 'react-router-dom';
+
+const baseApiUrl = helpers.VITE_API_URL;
+
+export default function ProductDetail() {
+  const { id } = useParams();
+  const idNumber = Number(id);
+
+  const { data: products = [], error, isLoading } = useSWR("products", api.getAll);
+  const product = products.find(product => product.productId === idNumber);
+  
+  if (!product) {
+    return <div className="text-center py-5"><p className="alert alert-warning">Product met ID {idNumber} is niet gevonden</p></div>;
+  }
+  
+  const handelTerugNaarVorigePagina = () => {
+    helpers.handelTerugNaarVorigePagina();
+  }
+
+  return (
+    <AsyncData error={error} loading={isLoading}>
+      <div className="container d-flex align-items-center justify-content-center min-vh-100">
+        <div className="card shadow-lg p-4" style={{ maxWidth: '600px', width: '100%' }}>
+          <div className="row g-3">
+            <div className="col-12 text-center">
+              <img 
+                src={product.image ? `${baseApiUrl}/img/${product.image}` : '/placeholder.jpg'} 
+                alt={`Picture of product: ${product.productName}`} 
+                className="img-fluid rounded border"
+                style={{ maxHeight: '250px', objectFit: 'cover' }}
+              />
+            </div>
+            <div className="col-12">
+              <h3 className="border-bottom pb-2 text-center">{product.productName}</h3>
+              <p className="text-muted text-center">{product.description || 'Geen beschrijving beschikbaar'}</p>
+              <h5 className="fw-bold text-primary">Prijs: ${product.unitPrice.toFixed(2)}</h5>
+              <h6 className="mt-3">Geleverd door:</h6>
+              <p>
+                <Link to={`/products/suppliers/${product.supplier.supplierId}`} className="text-decoration-none fw-bold">
+                  {product.supplier.firstName} {product.supplier.lastName}
+                </Link>
+              </p>
+              <button className='text-center btn btn-primary' onClick={handelTerugNaarVorigePagina}>
+                Back
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </AsyncData>
   );
 }
 ```

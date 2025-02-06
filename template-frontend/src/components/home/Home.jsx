@@ -2,6 +2,7 @@ import { useAuthentication } from '../../contexts/authentication';
 
 export default function Home() {
   const { isAuthed, user } = useAuthentication();
+
   return (
     <>
     <div

@@ -6,7 +6,7 @@ import * as api from '../../api/index';
 export default function UserList() {
    const { data: users = [], error, isLoading: loading } = useSWR("users", api.getAll);
   return (
-    <>
+    <div className="text-center mt-4">
       <h1>All of this template&apos;s users:</h1>
       <AsyncData error={error} loading={loading}>
         <div
@@ -35,6 +35,6 @@ export default function UserList() {
           )}
         </div>
       </AsyncData>
-    </>
+    </div>
   );
 }
