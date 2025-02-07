@@ -5,7 +5,7 @@ import type { KoaApplication } from '../types/koa';
 import { getLogger } from './logging';
 import ServiceError from './serviceError';
 import serve from 'koa-static';
-
+import koaHelmet from 'koa-helmet';
 
 const CORS_ORIGINS = config.get<string[]>('cors.origins');
 const CORS_MAX_AGE = config.get<number>('cors.maxAge');
@@ -105,4 +105,6 @@ export default function installMiddlewares(app: KoaApplication) {
     });
 
   app.use(bodyParser());
+
+  app.use(koaHelmet());
 }

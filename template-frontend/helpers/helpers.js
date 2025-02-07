@@ -5,6 +5,14 @@ export const getDagVanVandaag = new Date().getDay();
 export const getJaarVanVandaag = new Date().getFullYear();
 export const getUurVanVandaag = new Date().getHours();
 export const getTijdInMiliseconden = new Date().getTime();
+export const getTijdInUurMinutenSeconden = () => {
+  return {
+    uur : getDatumVanVandaag.getHours(),
+    minuten : getDatumVanVandaag.getMinutes(),
+    seconden : getDatumVanVandaag.getSeconds(),
+    miliseconden : getDatumVanVandaag.getMilliseconds(),
+  }
+}
 
 
 /**

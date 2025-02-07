@@ -323,7 +323,14 @@ export const getDagVanVandaag = new Date().getDay();
 export const getJaarVanVandaag = new Date().getFullYear();
 export const getUurVanVandaag = new Date().getHours();
 export const getTijdInMiliseconden = new Date().getTime();
-
+export const getTijdInUurMinutenSeconden = () => {
+  return {
+    uur : getDatumVanVandaag.getHours(),
+    minuten : getDatumVanVandaag.getMinutes(),
+    seconden : getDatumVanVandaag.getSeconds(),
+    miliseconden : getDatumVanVandaag.getMilliseconds(),
+  }
+}
 
 /**
  * Gaat terug naar de vorige pagina in de gebruiker zijn history
@@ -1588,18 +1595,38 @@ yarn add --dev @types/config;
 
 * Maak een `.env`-bestand aan:
 ```env
-NODE_ENV=production
+NODE_ENV=development
 ```
 
-* Maak een `config` folder met de `development` en `production` bestand:
+* Maak een `root/config` folder met de `development` en `production` bestand:
+* 
 ```ts
 export default {
-   log: {
-     // development = info
-     level: 'silly',
-     disabled: false,
-   },
- };
+  log: {
+    level: 'silly',
+    disabled: false,
+  },
+  cors: {
+    origins: ['http://localhost:5173'],
+    maxAge: 3 * 60 * 60,
+  },
+  auth: {
+    jwt: {
+      audience: 'robbe.template.be',
+      issuer: 'robbe.template.be',
+      expirationInterval: 60 * 60 * 3, // 3 uur
+      secret:
+        'eenveeltemoeilijksecretdatniemandooitzalradenandersisdesitegehacked',
+    },
+    argon: {
+      hashLength: 32,
+      timeCost: 6,
+      memoryCost: 2 ** 17,
+    },
+    maxDelay : 5000, // 5 seconden
+  },
+  
+};
 ```
 
 * Zet daar ook een ander bestand in: `custom-environment-variables.ts`
@@ -1643,6 +1670,11 @@ const rootLogger: winston.Logger = winston.createLogger({
 export const getLogger = () => {
   return rootLogger;
 };
+```
+* Voeg cors toe waarmee een webapplicatie, die wordt uitgevoerd onder één domein, toegang kan krijgen tot resources in een ander domein.
+```bash
+yarn add @koa/cors;
+yarn add --dev @types/koa__cors;
 ```
 
 ## Server maken
@@ -1861,6 +1893,17 @@ export interface KoaApplication
   extends Application<TemplateAppState, TemplateAppContext> {}
 
 export interface KoaRouter extends Router<TemplateAppState, TemplateAppContext> {}
+```
+
+* Nu doen we `common.ts` voor enkele responses op te vangen:
+```ts
+export interface ListResponse<T> {
+   items: T[];
+ }
+ 
+ export interface IdParams {
+   id: number;
+ }
 ```
 * Nu Koa ingesteld is, stellen we de types van onze endpoints in
 * We beginnen met: `user.ts`
@@ -2286,6 +2329,10 @@ export default (parent: KoaRouter) => {
 ```
 
 ### installMiddlewares
+* Installeer koa-helmet dit beheert het proces van het instellen en beheren van beveiligingsheaders in Koa-applicaties:
+```bash
+yarn add koa-helmet helmet;
+```
 
 * Maak een bestand `core/installMiddelwares.ts`
 ```ts
@@ -2296,7 +2343,7 @@ import type { KoaApplication } from '../types/koa';
 import { getLogger } from './logging';
 import ServiceError from './serviceError';
 import serve from 'koa-static';
-
+import koaHelmet from 'koa-helmet';
 
 const CORS_ORIGINS = config.get<string[]>('cors.origins');
 const CORS_MAX_AGE = config.get<number>('cors.maxAge');
@@ -2396,6 +2443,8 @@ export default function installMiddlewares(app: KoaApplication) {
     });
 
   app.use(bodyParser());
+
+  app.use(koaHelmet());
 }
 ```
 
@@ -2538,8 +2587,6 @@ export default {
     },
     maxDelay : 5000, // 5 seconden
   },
-   env: "development"
-
 };
 ```
 

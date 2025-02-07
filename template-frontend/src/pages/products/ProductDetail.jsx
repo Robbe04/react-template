@@ -10,7 +10,6 @@ const baseApiUrl = helpers.VITE_API_URL;
 export default function ProductDetail() {
   const { id } = useParams();
   const idNumber = Number(id);
-
   const { data: products = [], error, isLoading } = useSWR("products", api.getAll);
   const product = products.find(product => product.productId === idNumber);
   
