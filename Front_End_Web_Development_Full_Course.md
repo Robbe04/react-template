@@ -2392,6 +2392,8 @@ export default {
     },
     maxDelay : 5000, // 5 seconden
   },
+   env: "development"
+
 };
 ```
 
