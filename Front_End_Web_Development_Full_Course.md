@@ -122,6 +122,7 @@ web_modules/
 
 # dotenv environment variable files
 .env
+.env.test
 .env.development.local
 .env.test.local
 .env.production.local
@@ -189,6 +190,7 @@ dist
 
 ```bash
 yarn create vite naamProjectFrontend --template react-swc;
+cd naamProjectFrontend;
 yarn install;
 ```
 
@@ -1610,7 +1612,7 @@ export default {
     origins: ['http://localhost:5173'],
     maxAge: 3 * 60 * 60,
   },
-  auth: {
+  authentication: {
     jwt: {
       audience: 'robbe.template.be',
       issuer: 'robbe.template.be',
@@ -1629,7 +1631,7 @@ export default {
 };
 ```
 
-* Zet daar ook een ander bestand in: `custom-environment-variables.ts`
+* Zet daar ook een ander bestand in: `config/custom-environment-variables.ts`
 ```ts
 export default {
   env: 'NODE_ENV',
@@ -1644,7 +1646,7 @@ yarn add winston;
 yarn add config @types/config;
 ```
 
-* maak een `logging.ts` aan in de map `core` in de `src`:
+* maak `core/logging.ts` om querys/requests/statussen ... in de console te zien:
 ```ts
 import { env } from 'node:process'; 
 import winston from 'winston';
@@ -1799,7 +1801,7 @@ export async function shutdownData(): Promise<void> {
 }
 ```
 
-* Nu bouwen we een seed-bestand om data te steken in onze databank:
+* Nu bouwen we `data/seed.ts` om voorafgemaakte data te steken in onze databank:
 ```ts
 import { PrismaClient } from '@prisma/client';
 
@@ -2107,6 +2109,7 @@ export default handleDBError;
 
 * Nu onze types gebouwd zijn kunnen we beginnen met de endpoints zelf te bouwen
 * De API communiceert eerst via de servicelaag en dat wordt dan doorgegeven naar de REST-laag
+* Maak een bestand `service/user.ts`
 ```ts
 import {prisma} from "../data"
 import { User, UserCreateInput, UserUpdateInput } from "../types/user";
@@ -2133,9 +2136,15 @@ export const getById = async (id: number) : Promise<User> => {
 
 export const create = async (user : UserCreateInput) : Promise<User> => {
    try {
-      return prisma.user.create({
+      const user = prisma.user.create({
          data : user
       })
+
+      if (!user) {
+        throw ServiceError.internalServerError(
+          'An unexpected error occured when creating the user',
+        );
+    } 
    } catch (error : any){
       throw handleDBError(error)
    }
@@ -2143,6 +2152,7 @@ export const create = async (user : UserCreateInput) : Promise<User> => {
 }
 
 export const updateById = async (id: number, userChanges: UserUpdateInput) : Promise<User> => {
+  try {
    const user = await prisma.user.findUnique({
      where: {
        userId : id,
@@ -2161,9 +2171,13 @@ export const updateById = async (id: number, userChanges: UserUpdateInput) : Pro
    });
 
    return updatedUser;
+  } catch (error : any){
+      throw handleDBError(error)
+  }
  };
 
  export const deleteById = async (id: number) : Promise<void> => {
+  try {
    const user = await prisma.user.findUnique({
       where: {
         userId : id,
@@ -2179,6 +2193,9 @@ export const updateById = async (id: number, userChanges: UserUpdateInput) : Pro
          userId: id,
       }
    });
+  } catch (error : any){
+      throw handleDBError(error)
+  }
 };
 ```
 
@@ -2189,7 +2206,7 @@ export const updateById = async (id: number, userChanges: UserUpdateInput) : Pro
 yarn add joi
 ```
 
-* Daarna maken we een validatiebestand aan in de `core` voor validatie op requests die worden gestuurd:
+* Daarna maken we een validatiebestand aan `core/validation.ts` voor validatie op requests die worden gestuurd:
 ```ts
 import type { Schema, SchemaLike } from 'joi'; 
 import Joi from 'joi'; 
@@ -2241,7 +2258,7 @@ const validate = (scheme: RequestValidationSchemeInput | null) => {
 export default validate;
 ```
 
-* Nu kunnen we in `src/rest/user.ts` de effectieve API bouwen:
+* Nu kunnen we in `rest/user.ts` de effectieve API bouwen:
 ```ts
 import { KoaContext, KoaRouter, TemplateAppContext, TemplateAppState } from "../types/koa";
 import * as userService from "../service/user"
